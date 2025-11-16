@@ -49,10 +49,7 @@ export const updateUser = async (req, res, next) =>{
     } catch (error) {
         next(error)
     }   
-} */
-
-
-export const updateUser = async (req, res, next) => {
+}export const updateUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
 
@@ -88,7 +85,40 @@ export const updateUser = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+}; */
+
+
+export const updateUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const { name, email, password, currentPassword } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Check current password
+    if (!currentPassword) {
+      return res.status(400).json({ message: "Current password is required" });
+    }
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Current password is incorrect" });
+    }
+
+    // Update fields
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (password) user.password = await bcrypt.hash(password, 10);
+
+    await user.save();
+
+    res.status(200).json({ success: true, data: user });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
+
+
 
 export const deleteUser = async (req, res, next) =>{
     try {
