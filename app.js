@@ -30,7 +30,7 @@ app.get('/', (req, res) => {
 
 
 app.listen(PORT, async () => {
-  console.log(`Server is running on ${SERVER_URL}`);
+  console.log(`Server is running on ${PORT}`);
   await connectToDatabase();
 });
 export default app;
